@@ -5,7 +5,9 @@ import (
 	"github.com/lqqyt2423/go-mitmproxy/proxy"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"os/signal"
 	"regexp"
+	"syscall"
 )
 
 const (
@@ -38,7 +40,8 @@ func (t *TestAddon) Request(f *proxy.Flow) {
 
 func main() {
 	log.SetLevel(log.FatalLevel)
-	fmt.Println("程序已启动，开始监听抽卡记录链接。请打开游戏内抽卡记录")
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
 	err := SetProxy(true, "127.0.0.1:18191", ignoreUrl)
 	if err != nil {
 		log.Error(err)
@@ -55,17 +58,23 @@ func main() {
 		exit()
 	}
 	p.AddAddon(&TestAddon{})
+	fmt.Println("程序已启动，开始监听抽卡记录链接。请打开游戏内抽卡记录")
 	go func() {
 		log.Fatal(p.Start())
 	}()
+	quit := func() {
+		fmt.Println("正在取消代理...")
+		err = SetProxy(false, "", "")
+		exit()
+		fmt.Println("正在关闭....")
+		_ = p.Close()
+	}
 	for {
 		select {
 		case <-ch:
-			fmt.Println("正在取消代理...")
-			err = SetProxy(false, "", "")
-			exit()
-			fmt.Println("正在关闭....")
-			_ = p.Close()
+			quit()
+		case <-sigs:
+			quit()
 		}
 	}
 }
