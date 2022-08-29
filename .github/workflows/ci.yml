@@ -17,7 +17,6 @@ jobs:
         # build and publish in parallel: linux/386, linux/amd64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
         goos: [ windows ]
         goarch: [ amd64 ]
-        exclude:
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
