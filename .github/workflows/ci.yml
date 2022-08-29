@@ -1,6 +1,6 @@
 name: CI
 
-on: [push, pull_request,workflow_dispatch]
+on: [ push, pull_request,workflow_dispatch ]
 
 env:
   BINARY_PREFIX: "cocogoat-signin_"
@@ -15,8 +15,8 @@ jobs:
     strategy:
       matrix:
         # build and publish in parallel: linux/386, linux/amd64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
-        goos: [windows]
-        goarch: [amd64]
+        goos: [ windows ]
+        goarch: [ amd64 ]
         exclude:
       fail-fast: true
     steps:
